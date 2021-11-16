@@ -64,7 +64,23 @@ async function run() {
             const cursor = bookingsCollection.find(query);
             const bookings = await cursor.toArray();
             res.json(bookings);
+        });
+
+        // send all bookings
+        app.get('/bookings/admin', async(req, res) => {
+            const cursor = bookingsCollection.find({});
+            const booking = await cursor.toArray();
+            res.json(booking);
         })
+
+        // delete a booking
+        app.delete('/bookings/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await bookingsCollection.deleteOne(query);
+            console.log(result);
+            res.json(result);
+        });
         
     }
     finally {
