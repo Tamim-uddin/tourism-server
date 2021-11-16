@@ -22,34 +22,48 @@ async function run() {
         await client.connect();
         const database = client.db('tour-wb');
         const tourCollection = database.collection('tours');
+        const bookingsCollection = database.collection('bookings');
 
-        // post api
+        // collect all tours
         app.post('/tours', async (req, res) => {
             const tour = req.body;
             console.log('hiting the post api', tour);
             const result = await tourCollection.insertOne(tour);
             console.log(result);
             res.json(result)
-
         });
 
-
-
-
-        // get api
+        // send all tours to client side
         app.get('/tours', async (req, res) => {
             const cursor = tourCollection.find({});
             const tour = await cursor.toArray();
             res.send(tour);
-
         });
 
-        // get a single tour
+        // send to client side a single tour
         app.get('/tours/:id', async(req, res) => {
             const id = req.params.id;
             const query = {_id: ObjectId(id)};
             const tour = await tourCollection.findOne(query);
             res.json(tour);
+        });
+
+        // collect booking order
+        app.post('/bookings', async(req, res) => {
+            const booking = req.body;
+            console.log(booking);
+            const result = await bookingsCollection.insertOne(booking);
+            console.log(result);
+            res.json(result);
+        });
+
+        // send bookings via the email checking
+        app.get('/bookings', async(req, res) => {
+            const email = req.query.email;
+            const query = {email: email};
+            const cursor = bookingsCollection.find(query);
+            const bookings = await cursor.toArray();
+            res.json(bookings);
         })
         
     }
